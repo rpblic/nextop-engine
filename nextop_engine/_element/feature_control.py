@@ -7,7 +7,7 @@ from _element import varr
 import pandas as pd
 import numpy as np
 import copy
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import OrderedDict
 
 def xlsx_opener(df_dir, inputfilename, merged= True, inputsheetname= None):
@@ -144,6 +144,17 @@ def dir_list(data_path, ext):
 #             df_x[x_feature]= df[x_feature]
 #             dict_of_dfs[x_feature]= df_x
 #         return dict_of_dfs
+
+def train_test(df, num_of_data= 5, delay= 70):
+    test_end_date= varr.LAST_DATE
+    train_test_dict= {}
+    for i in range(num_of_data):
+        train_test_dict[i]= {}
+        test_start_date= test_end_date- timedelta(days= varr.FORECASTDAY)
+        train_test_dict[i]['train']= df.loc[df['ds']<= test_start_date, :]
+        train_test_dict[i]['test']= df.loc[(df['ds']> test_start_date)&(df['ds']<= test_end_date), :]
+        test_end_date= test_end_date- timedelta(days= delay)
+    return train_test_dict
 
 # Main #########################################################################
 

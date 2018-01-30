@@ -58,13 +58,13 @@ newyearbefore = pd.DataFrame({
 HOLYDAYBETA = pd.concat((newyear, thanksgiving, chocostick, christmas, newyearbefore, thanksgivingbefore))
 PJ_DIR= 'C:\\Studying\\Project_Nextop\\nextop-engine\\nextop_engine'
 TEMP_DATA_DIR= '\\_element\\data\\temp_data\\'
-ALG_PRPPHET_DIR= '\\_usecase\\algorithm_prophet.py'
+ALG_PROPHET_DIR= '\\_usecase\\algorithm_prophet.py'
 # INPUT_FILENAME=
 DF_DIR= '\\_element\\data\\private\\'
 COLNAME_KPPDAILY= ['ds', 'rain_amount', 'temp_max', 'temp_min', 'y']
 START_DATE= datetime(2010, 7, 1)
 START_DATE_STR= START_DATE.strftime("%Y-%m-%d")
-FORECASTDAY= 30
+FORECASTDAY= 7
 LAST_DATE= datetime(2017, 11, 30)
 END_DATE= (LAST_DATE - timedelta(days=FORECASTDAY))
 END_DATE_STR= END_DATE.strftime("%Y-%m-%d")
