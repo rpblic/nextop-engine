@@ -10,6 +10,24 @@ newyear = pd.DataFrame({
     'upper_window': 2,
 })
 
+newyearbefore_revised = pd.DataFrame({
+    'holiday': 'newyearbefore',
+    'ds': pd.to_datetime(['2011-01-31', '2012-01-20',
+                          '2013-02-07', '2014-01-28', '2015-02-16',
+                          '2016-02-06', '2017-02-25', '2018-02-13']),
+    'lower_window': -21,
+    'upper_window': 0,
+})
+
+newyearbefore = pd.DataFrame({
+    'holiday': 'newyearbefore',
+    'ds': pd.to_datetime(['2011-01-26', '2012-01-15',
+                          '2013-02-02', '2014-01-23', '2015-02-11',
+                          '2016-02-01', '2017-02-20', '2018-02-08']),
+    'lower_window': -4,
+    'upper_window': 4,
+})
+
 thanksgiving = pd.DataFrame({
     'holiday': 'thanksgiving',
     'ds': pd.to_datetime(['2010-09-22', '2011-09-12', '2012-09-30',
@@ -17,6 +35,24 @@ thanksgiving = pd.DataFrame({
                           '2016-09-15', '2017-10-04', '2018-09-24']),
     'lower_window': -2,
     'upper_window': 2,
+})
+
+thanksgivingbefore_revised = pd.DataFrame({
+    'holiday': 'thanksgivingbefore',
+    'ds': pd.to_datetime(['2010-09-19', '2011-09-09', '2012-09-27',
+                          '2013-09-16', '2014-09-06', '2015-09-24',
+                          '2016-09-12', '2017-10-01', '2018-09-21']),
+    'lower_window': -56,
+    'upper_window': 0,
+})
+
+thanksgivingbefore = pd.DataFrame({
+    'holiday': 'thanksgivingbefore',
+    'ds': pd.to_datetime(['2010-09-14', '2011-09-04', '2012-09-22',
+                          '2013-09-11', '2014-09-01', '2015-09-19',
+                          '2016-09-07', '2017-09-26', '2018-09-16']),
+    'lower_window': -4,
+    'upper_window': 4,
 })
 
 chocostick = pd.DataFrame({
@@ -37,34 +73,17 @@ christmas = pd.DataFrame({
     'upper_window': 2,
 })
 
-thanksgivingbefore = pd.DataFrame({
-    'holiday': 'thanksgivingbefore',
-    'ds': pd.to_datetime(['2010-09-14', '2011-09-04', '2012-09-22',
-                          '2013-09-11', '2014-09-01', '2015-09-19',
-                          '2016-09-07', '2017-09-26', '2018-09-16']),
-    'lower_window': -4,
-    'upper_window': 4,
-})
-
-newyearbefore = pd.DataFrame({
-    'holiday': 'newyearbefore',
-    'ds': pd.to_datetime(['2011-01-26', '2012-01-15',
-                          '2013-02-02', '2014-01-23', '2015-02-11',
-                          '2016-02-01', '2017-02-20', '2018-02-08']),
-    'lower_window': -4,
-    'upper_window': 4,
-})
-
 HOLYDAYBETA = pd.concat((newyear, thanksgiving, chocostick, christmas, newyearbefore, thanksgivingbefore))
-PJ_DIR= 'C:\\Studying\\Project_Nextop\\nextop-engine\\nextop_engine'
+HOLYDAYBETA_revised = pd.concat((newyear, thanksgiving, chocostick, christmas, newyearbefore_revised, thanksgivingbefore_revised))
+PJ_DIR= 'C:\\Nextop\\nextop-engine\\nextop_engine'
 TEMP_DATA_DIR= '\\_element\\data\\temp_data\\'
-ALG_PRPPHET_DIR= '\\_usecase\\algorithm_prophet.py'
+ALG_PROPHET_DIR= '\\_usecase\\algorithm_prophet.py'
 # INPUT_FILENAME=
 DF_DIR= '\\_element\\data\\private\\'
 COLNAME_KPPDAILY= ['ds', 'rain_amount', 'temp_max', 'temp_min', 'y']
 START_DATE= datetime(2010, 7, 1)
 START_DATE_STR= START_DATE.strftime("%Y-%m-%d")
-FORECASTDAY= 30
+FORECASTDAY= 7
 LAST_DATE= datetime(2017, 11, 30)
 END_DATE= (LAST_DATE - timedelta(days=FORECASTDAY))
 END_DATE_STR= END_DATE.strftime("%Y-%m-%d")
