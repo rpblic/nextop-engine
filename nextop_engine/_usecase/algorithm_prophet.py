@@ -23,7 +23,7 @@ from scipy.stats import pearsonr
 import copy
 
 
-def Bayseian2(txs_traintest, unit, regressor_col=None, holidaybeta = varr.HOLYDAYBETA):
+def Bayseian2(txs_traintest, unit, holidaybeta = varr.HOLYDAYBETA):
     global seasonality_option
     txs_train = txs_traintest['train']
     txs_test = txs_traintest['test']
@@ -60,17 +60,12 @@ def Bayseian2(txs_traintest, unit, regressor_col=None, holidaybeta = varr.HOLYDA
     if seasonality_option[1]:
         model.add_seasonality(name='weekly', period=7, fourier_order=5, prior_scale=0.1)
 
-    if regressor_col:
-        for feature in regressor_col:
-            if not feature == 'ds': model.add_regressor(feature)
+    for feature in txs_trainX.columns.values.tolist():
+        if not feature == 'ds': model.add_regressor(feature)
 
     model.fit(txs_train)
-    # future= txs_raw[['ds', 'rain_amount', 'temp_max', 'temp_min']]
     future = pd.concat([txs_trainX, txs_testX], axis=0)
-    # future['ds']= pd.to_datetime(future['ds'], format= "%Y-%m-%d")
-    #
-    # print(future[future.isnull().any(axis=1)])
-    # print(future)
+
     forecastProphetTable = model.predict(future)
     return {
         'model': model,
