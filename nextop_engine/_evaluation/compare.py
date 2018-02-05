@@ -27,21 +27,22 @@ def AlgorithmCompare(testY, algorithm):
     print(nameOfBestAlgorithm, 'WON!!!!!!')
     return nameOfBestAlgorithm
 
-def print_result(forecast_dict):
+def print_err_rate(forecast_dict, m_name= ''):
     for i, case_dict in forecast_dict.items():
-        print('RMSE with segment {}: {:0.4f}'.format(i, case_dict['RMSE']))
-        print('MAPE with segment {}: {:0.4f}'.format(i, case_dict['MAPE']))
-        print('MAPE_with_std with segment {}: {:0.4f}'.format(i, case_dict['MAPE_with_std']))
-        print('MAPE_div_std with segment {}: {:0.4f}'.format(i, case_dict['MAPE_div_std']))
-        print('sMAPE with segment {}: {:0.4f}'.format(i, case_dict['sMAPE']))
-        print('\n')
+        if m_name in i:
+            print('RMSE with segment {}: {:0.4f}'.format(i, case_dict['RMSE']))
+            print('MAPE with segment {}: {:0.4f}'.format(i, case_dict['MAPE']))
+            print('MAPE_with_std with segment {}: {:0.4f}'.format(i, case_dict['MAPE_with_std']))
+            print('MAPE_div_std with segment {}: {:0.4f}'.format(i, case_dict['MAPE_div_std']))
+            print('sMAPE with segment {}: {:0.4f}'.format(i, case_dict['sMAPE']))
+            print('\n')
     return None
 
-def err_rate_result(forecast_dict):
+def err_rate(forecast_dict):
     for i, case_dict in forecast_dict.items():
         case_dict['RMSE']= calc.rms_error(case_dict['forecast']['y'], case_dict['forecast']['yhat'])
         case_dict['MAPE'] = calc.map_error(case_dict['forecast']['y'], case_dict['forecast']['yhat'])
-        case_dict['MAPE_with_std'] = calc.map_error_with_std_error(case_dict['forecast']['y'], case_dict['forecast']['yhat'])
+        case_dict['MAPE_with_std'] = calc.map_error_with_std(case_dict['forecast']['y'], case_dict['forecast']['yhat'])
         case_dict['MAPE_div_std'] = calc.map_error_div_std(case_dict['forecast']['y'], case_dict['forecast']['yhat'])
         case_dict['sMAPE'] = calc.smap_error(case_dict['forecast']['y'], case_dict['forecast']['yhat'])
 

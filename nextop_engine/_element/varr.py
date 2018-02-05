@@ -75,7 +75,7 @@ christmas = pd.DataFrame({
 
 HOLYDAYBETA = pd.concat((newyear, thanksgiving, chocostick, christmas, newyearbefore, thanksgivingbefore))
 HOLYDAYBETA_revised = pd.concat((newyear, thanksgiving, chocostick, christmas, newyearbefore_revised, thanksgivingbefore_revised))
-PJ_DIR= 'C:\\Nextop\\nextop-engine\\nextop_engine'
+PJ_DIR= 'C:\\Studying\\Project_Nextop\\nextop-engine\\nextop_engine'
 TEMP_DATA_DIR= '\\_element\\data\\temp_data\\'
 ALG_PROPHET_DIR= '\\_usecase\\algorithm_prophet.py'
 # INPUT_FILENAME=
