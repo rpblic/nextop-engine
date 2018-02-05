@@ -5,7 +5,11 @@ sys.path.append(path_name)
 from _element import varr
 
 import pandas as pd
+from pandas.plotting import autocorrelation_plot, lag_plot
 import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+
 import copy
 from datetime import datetime, timedelta
 from collections import OrderedDict
@@ -149,8 +153,10 @@ def cut_df(txs, forecastday= varr.FORECASTDAY):
 
 def divide_multiple_y(dict_of_df, raw_key, y_col, x_col):
     for y in y_col:
-        columns= copy.deepcopy(x_col).append(y)
+        columns= copy.deepcopy(x_col)
+        columns.append(y)
         dict_of_df[y]= copy.deepcopy(dict_of_df[raw_key][columns])
+        colname(dict_of_df[y], {y: 'y'})
     del dict_of_df[raw_key]
     return None
 
@@ -203,7 +209,7 @@ def train_test_sample(df, y, x_col, forecastday= varr.FORECASTDAY):
                         }
 
     return result_dict
-
+    
 # Main #########################################################################
 
 if __name__== '__main__':

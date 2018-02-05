@@ -15,6 +15,7 @@ from scipy.special import expit
 from scipy.stats import pearsonr
 import copy
 import collections
+import matplotlib.pyplot as plt
 
 # Prophet ######
 
@@ -195,6 +196,12 @@ class Prophet_timeseries:
     def extract(self, m_name, feature_list):
          abs_list= self._model[m_name]['forecastProphetTable'][feature_list].sum(axis= 1).abs()
          return self._model[m_name]['forecastProphetTable'][abs_list>0][feature_list]
+
+
+    def plot(self, m_name):
+        self._model[m_name]['model'].plot(self._model[m_name]['forecastProphetTable'])
+        self._model[m_name]['model'].plot_components(self._model[m_name]['forecastProphetTable'])
+        plt.show()
 
 
 
