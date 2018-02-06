@@ -48,7 +48,7 @@ class Prophet_timeseries:
         return None
 
 
-    def add_model(self, name, unit, holidaybeta = varr.HOLYDAYBETA, regressor= True, short_turm= False):
+    def add_model(self, name, unit, holidaybeta = varr.HOLYDAYBETA, regressor= True, short_turm= False, growth= 'linear'):
         self._model[name]= {}
         self._model[name]['seasonality']= set((7, 30.5, 365))
 
@@ -63,7 +63,8 @@ class Prophet_timeseries:
         self._model[name]['model'] = Prophet(daily_seasonality= (1 in self._model[name]['seasonality']),
                                             weekly_seasonality=False,
                                             yearly_seasonality= (365 in self._model[name]['seasonality']),
-                                            holidays=holidaybeta)
+                                            holidays=holidaybeta,
+                                            growth= growth)
 
         if 30.5 in self._model[name]['seasonality']:
             self._model[name]['model'].add_seasonality(name='monthly', period=30.5, fourier_order=5)
@@ -145,9 +146,39 @@ class Prophet_timeseries:
                     self._model[m_name_withi]['futuredate']= pd.concat([case_dict['trainX'], case_dict['testX']],
                                                                 axis= 0)
                     self._model[m_name_withi]['forecastProphetTable']= self._model[m_name_withi]['model'].predict(self._model[m_name_withi]['futuredate'])
+                    self._model[m_name_withi]['forecastProphetTable']['yhat']= self._model[m_name_withi]['forecastProphetTable']['yhat'].apply(lambda x: max(x, 0))
                 else:
                     self._model[m_name_withi]['futuredate']= Valueerror('error in table func')
                     self._model[m_name_withi]['forecastProphetTable']= Valueerror('error in table func')
+        
+        return None
+
+
+    def log_fit(self, m_name, txs_traintest= None):
+        if txs_traintest:
+            self.txs_traintest= txs_traintest
+        elif self.txs_traintest is None:
+            raise Keyerror('no data given')
+        else:
+            pass
+
+        for i, case_dict in self.txs_traintest.items():
+            m_name_withi= '{}_{}'.format(m_name, str(i))
+            case_dict['train']['y']= case_dict['train']['y'].replace(to_replace= 0, value= 1)
+            case_dict['train']['y']= np.log(case_dict['train']['y'])
+            # print(case_dict)
+            self._model[m_name_withi]= copy.deepcopy(self._model[m_name])
+            self._model[m_name_withi]['model'].fit(case_dict['train'])
+        
+            if 'testX' in case_dict.keys():
+                self._model[m_name_withi]['futuredate']= pd.concat([case_dict['trainX'], case_dict['testX']],
+                                                            axis= 0)
+                self._model[m_name_withi]['futuredate']['cap']= 13
+                self._model[m_name_withi]['forecastProphetTable']= self._model[m_name_withi]['model'].predict(self._model[m_name_withi]['futuredate'])
+                self._model[m_name_withi]['forecastProphetTable']['yhat']= np.exp(self._model[m_name_withi]['forecastProphetTable']['yhat'])
+            else:
+                self._model[m_name_withi]['futuredate']= Valueerror('error in table func')
+                self._model[m_name_withi]['forecastProphetTable']= Valueerror('error in table func')
         
         return None
 

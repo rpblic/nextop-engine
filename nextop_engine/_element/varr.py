@@ -6,8 +6,8 @@ newyear = pd.DataFrame({
     'ds': pd.to_datetime(['2011-02-03', '2012-01-23',
                           '2013-02-10', '2014-01-31', '2015-02-19',
                           '2016-02-09', '2017-02-28', '2018-02-16']),
-    'lower_window': -2,
-    'upper_window': 2,
+    'lower_window': -4,
+    'upper_window': 4,
 })
 
 newyearbefore_revised = pd.DataFrame({
@@ -15,7 +15,7 @@ newyearbefore_revised = pd.DataFrame({
     'ds': pd.to_datetime(['2011-01-31', '2012-01-20',
                           '2013-02-07', '2014-01-28', '2015-02-16',
                           '2016-02-06', '2017-02-25', '2018-02-13']),
-    'lower_window': -21,
+    'lower_window': -7,
     'upper_window': 0,
 })
 
@@ -33,8 +33,8 @@ thanksgiving = pd.DataFrame({
     'ds': pd.to_datetime(['2010-09-22', '2011-09-12', '2012-09-30',
                           '2013-09-19', '2014-09-09', '2015-09-27',
                           '2016-09-15', '2017-10-04', '2018-09-24']),
-    'lower_window': -2,
-    'upper_window': 2,
+    'lower_window': -4,
+    'upper_window': 4,
 })
 
 thanksgivingbefore_revised = pd.DataFrame({
@@ -42,7 +42,7 @@ thanksgivingbefore_revised = pd.DataFrame({
     'ds': pd.to_datetime(['2010-09-19', '2011-09-09', '2012-09-27',
                           '2013-09-16', '2014-09-06', '2015-09-24',
                           '2016-09-12', '2017-10-01', '2018-09-21']),
-    'lower_window': -56,
+    'lower_window': -7,
     'upper_window': 0,
 })
 
@@ -73,9 +73,9 @@ christmas = pd.DataFrame({
     'upper_window': 2,
 })
 
-HOLYDAYBETA = pd.concat((newyear, thanksgiving, chocostick, christmas, newyearbefore, thanksgivingbefore))
-HOLYDAYBETA_revised = pd.concat((newyear, thanksgiving, chocostick, christmas, newyearbefore_revised, thanksgivingbefore_revised))
-PJ_DIR= 'C:\\Studying\\Project_Nextop\\nextop-engine\\nextop_engine'
+HOLYDAYBETA_old = pd.concat((newyear, thanksgiving, chocostick, christmas, newyearbefore, thanksgivingbefore))
+HOLYDAYBETA = pd.concat((newyear, thanksgiving))
+PJ_DIR= 'C:\\Nextop\\nextop-engine\\nextop_engine'
 TEMP_DATA_DIR= '\\_element\\data\\temp_data\\'
 ALG_PROPHET_DIR= '\\_usecase\\algorithm_prophet.py'
 # INPUT_FILENAME=

@@ -146,17 +146,18 @@ def cut_col(df, column_list):
     return df[column_list]
 
 def cut_df(txs, forecastday= varr.FORECASTDAY):
-    txs_train= txs.iloc[:-forecastday, :]
-    txs_test= txs.iloc[-forecastday:, :]
+    txs_train= txs[txs.ds<=txs.ds.max()- timedelta(days=forecastday)]
+    txs_test= txs[txs.ds> txs.ds.max()- timedelta(days=forecastday)]
     return (txs_train, txs_test)
 
 
-def divide_multiple_y(dict_of_df, raw_key, y_col, x_col):
+def divide_multiple_y(dict_of_df, raw_key, y_col, x_col, checkpoint= None):
     for y in y_col:
         columns= copy.deepcopy(x_col)
         columns.append(y)
-        dict_of_df[y]= copy.deepcopy(dict_of_df[raw_key][columns])
-        colname(dict_of_df[y], {y: 'y'})
+        keyname= y if not checkpoint else '{}_{}'.format(y, checkpoint)
+        dict_of_df[keyname]= copy.deepcopy(dict_of_df[raw_key][columns])
+        colname(dict_of_df[keyname], {y: 'y'})
     del dict_of_df[raw_key]
     return None
 
