@@ -1,5 +1,48 @@
 import pandas as pd
+import pickle
 from datetime import datetime, timedelta
+
+
+PJ_DIR= 'C:\\Studying\\Project_Nextop\\nextop-engine\\nextop_engine'
+TEMP_DATA_DIR= '\\_element\\data\\temp_data\\'
+ALG_PROPHET_DIR= '\\_usecase\\algorithm_prophet.py'
+# INPUT_FILENAME=
+DF_DIR= '\\_element\\data\\private\\'
+COLNAME_KPPDAILY= ['ds', 'rain_amount', 'temp_max', 'temp_min', 'y']
+START_DATE= datetime(2010, 7, 1)
+START_DATE_STR= START_DATE.strftime("%Y-%m-%d")
+FORECASTDAY= 7
+LAST_DATE= datetime(2017, 11, 30)
+END_DATE= (LAST_DATE - timedelta(days=FORECASTDAY))
+END_DATE_STR= END_DATE.strftime("%Y-%m-%d")
+# print(holidaybeta)
+#           ds       holiday  lower_window  upper_window
+# 0 2011-02-03       newyear            -1             1
+# 1 2012-01-23       newyear            -1             1
+# 2 2013-02-10       newyear            -1             1
+# 3 2014-01-31       newyear            -1             1
+# 4 2015-02-19       newyear            -1             1
+# 5 2016-02-09       newyear            -1             1
+# 6 2017-02-28       newyear            -1             1
+# 7 2018-02-16       newyear            -1             1
+# 0 2010-09-22  thanksgiving            -1             1
+# 1 2011-09-12  thanksgiving            -1             1
+# 2 2012-09-30  thanksgiving            -1             1
+# 3 2013-09-19  thanksgiving            -1             1
+# 4 2014-09-09  thanksgiving            -1             1
+# 5 2015-09-27  thanksgiving            -1             1
+# 6 2016-09-15  thanksgiving            -1             1
+# 7 2017-10-04  thanksgiving            -1             1
+# 8 2018-09-24  thanksgiving            -1             1
+# 0 2010-11-11    chocostick             0             0
+# 1 2011-11-11    chocostick             0             0
+# 2 2012-11-11    chocostick             0             0
+# 3 2013-11-11    chocostick             0             0
+# 4 2014-11-11    chocostick             0             0
+# 5 2015-11-11    chocostick             0             0
+# 6 2016-11-11    chocostick             0             0
+# 7 2017-11-11    chocostick             0             0
+# 8 2018-11-11    chocostick             0             0
 
 newyear = pd.DataFrame({
     'holiday': 'newyear',
@@ -55,63 +98,14 @@ thanksgivingbefore = pd.DataFrame({
     'upper_window': 4,
 })
 
-chocostick = pd.DataFrame({
-    'holiday': 'chocostick',
-    'ds': pd.to_datetime(['2010-11-11', '2011-11-11', '2012-11-11',
-                          '2013-11-11', '2014-11-11', '2015-11-11',
-                          '2016-11-11', '2017-11-11', '2018-11-11']),
-    'lower_window': -2,
-    'upper_window': 2,
-})
+with open(PJ_DIR+TEMP_DATA_DIR+'reddays.pickle', 'rb') as f:
+  reddaylist= pickle.load(f)
+redday = pd.DataFrame({
+  'holiday': 'redday',
+  'ds': pd.to_datetime(reddaylist),
+  'lower_window': -1,
+  'upper_window': 1,
+  })
 
-christmas = pd.DataFrame({
-    'holiday': 'christmas',
-    'ds': pd.to_datetime(['2010-12-25', '2011-12-25', '2012-12-25',
-                          '2013-12-25', '2014-12-25', '2015-12-25',
-                          '2016-12-25', '2017-12-25', '2018-12-25']),
-    'lower_window': -2,
-    'upper_window': 2,
-})
-
-HOLYDAYBETA_old = pd.concat((newyear, thanksgiving, chocostick, christmas, newyearbefore, thanksgivingbefore))
-HOLYDAYBETA = pd.concat((newyear, thanksgiving))
-PJ_DIR= 'C:\\Nextop\\nextop-engine\\nextop_engine'
-TEMP_DATA_DIR= '\\_element\\data\\temp_data\\'
-ALG_PROPHET_DIR= '\\_usecase\\algorithm_prophet.py'
-# INPUT_FILENAME=
-DF_DIR= '\\_element\\data\\private\\'
-COLNAME_KPPDAILY= ['ds', 'rain_amount', 'temp_max', 'temp_min', 'y']
-START_DATE= datetime(2010, 7, 1)
-START_DATE_STR= START_DATE.strftime("%Y-%m-%d")
-FORECASTDAY= 7
-LAST_DATE= datetime(2017, 11, 30)
-END_DATE= (LAST_DATE - timedelta(days=FORECASTDAY))
-END_DATE_STR= END_DATE.strftime("%Y-%m-%d")
-# print(holidaybeta)
-#           ds       holiday  lower_window  upper_window
-# 0 2011-02-03       newyear            -1             1
-# 1 2012-01-23       newyear            -1             1
-# 2 2013-02-10       newyear            -1             1
-# 3 2014-01-31       newyear            -1             1
-# 4 2015-02-19       newyear            -1             1
-# 5 2016-02-09       newyear            -1             1
-# 6 2017-02-28       newyear            -1             1
-# 7 2018-02-16       newyear            -1             1
-# 0 2010-09-22  thanksgiving            -1             1
-# 1 2011-09-12  thanksgiving            -1             1
-# 2 2012-09-30  thanksgiving            -1             1
-# 3 2013-09-19  thanksgiving            -1             1
-# 4 2014-09-09  thanksgiving            -1             1
-# 5 2015-09-27  thanksgiving            -1             1
-# 6 2016-09-15  thanksgiving            -1             1
-# 7 2017-10-04  thanksgiving            -1             1
-# 8 2018-09-24  thanksgiving            -1             1
-# 0 2010-11-11    chocostick             0             0
-# 1 2011-11-11    chocostick             0             0
-# 2 2012-11-11    chocostick             0             0
-# 3 2013-11-11    chocostick             0             0
-# 4 2014-11-11    chocostick             0             0
-# 5 2015-11-11    chocostick             0             0
-# 6 2016-11-11    chocostick             0             0
-# 7 2017-11-11    chocostick             0             0
-# 8 2018-11-11    chocostick             0             0
+HOLYDAYBETA_old = pd.concat((newyear, thanksgiving, newyearbefore, thanksgivingbefore, redday))
+HOLYDAYBETA = pd.concat((newyear, thanksgiving, redday))

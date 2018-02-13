@@ -26,7 +26,7 @@ def xlsx_opener(df_dir, inputfilename, merged= True, inputsheetname= None):
         for sheet_name in inputsheetname:
             df= xls.parse(sheet_name)
             df_txs= pd.concat([df_txs, df])
-        return {'raw': df_txs}
+        return df_txs
     else:
         dict_of_dfs = {}
         for sheet_name in inputsheetname:
@@ -61,32 +61,32 @@ def struct(df, idx_col, ft_col, val_col, y_sum= False):
     if y_sum: df['y_sum']= df.sum(axis=1)
     return df
 
-def unite_dttype(serial):
+def uniteDatetimeShape(df):
     """
     datetime을 pd.to_datetime 코드로 처리할 때, datetime.strptime 코드로 처리할 때 각각
     Timestamp, datetime dtype로 바뀌는 문제가 나타났습니다.
     이를 해결하기 위해 datetime의 type을 일정하게 유지하도록 합니다.
     """
-    if serial.dtype== np.str:
-        serial.apply(lambda x: datetime(int(x[:4]),int(x[4:6]),int(x[6:])) if len(x)==8 \
-                            else datetime.strptime(x, "%Y-%m-%d"))
-    elif serial.dtype== np.datetime64:
-        serial= pd.to_datetime(serial, box=True, format= '%Y/%m/%d', exact=True)
-    return serial
+    df['ds']= pd.to_datetime(
+        df['ds'], box=True, format= '%Y/%m/%d', exact=True
+        )
 
 
-def save_as_xlsx(df_dir, df, inputfilename, specialfilename=None):
+def save_as_xlsx(df_dir, dict_of_df, inputfilename, specialfilename=None):
     """
     여러 개의 dfsheet로 되어 있는 dictionary(또는 OrderedDict) 데이터를 엑셀에 저장합니다.
     아직 디렉토리를 설정할 수 없어 나중에 수정해야 합니다.
     """
-    if specialfilename==None: specialfilename= df_dir + inputfilename[:-5] + '_restructured' + inputfilename[-5:]
-    else: specialfilename= df_dir + inputfilename[:-5] + specialfilename + inputfilename[-5:]
+    if specialfilename==None:
+        specialfilename= df_dir + inputfilename[:-5] + '_restructured' + inputfilename[-5:]
+    else:
+        specialfilename= df_dir + inputfilename[:-5] + specialfilename + inputfilename[-5:]
     writer= pd.ExcelWriter(specialfilename, engine= 'xlsxwriter')
-    if is_dict(df):
-        for (dfsheetname, df) in df.items():
-            df.to_excel(writer, sheet_name= dfsheetname)
-    else: df.to_excel(writer, sheet_name= 'data_merged')
+    if is_dict(dict_of_df):
+        for (dfsheetname, case_df) in dict_of_df.items():
+            case_df['forecast'].to_excel(writer, sheet_name= dfsheetname)
+    else:
+        dict_of_df.to_excel(writer, sheet_name= 'data_merged')
     writer.save()
     return None
 
@@ -145,9 +145,11 @@ def dir_list(data_path, ext):
 def cut_col(df, column_list):
     return df[column_list]
 
-def cut_df(txs, forecastday= varr.FORECASTDAY):
-    txs_train= txs[txs.ds<=txs.ds.max()- timedelta(days=forecastday)]
-    txs_test= txs[txs.ds> txs.ds.max()- timedelta(days=forecastday)]
+def cut_df(txs, forecastday= varr.FORECASTDAY, last_date= None):
+    if not last_date:
+        last_date= txs.ds.max()
+    txs_train= txs[txs.ds<= last_date- timedelta(days=forecastday)]
+    txs_test= txs[txs.ds> last_date- timedelta(days=forecastday)]
     return (txs_train, txs_test)
 
 

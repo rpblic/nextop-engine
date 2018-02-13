@@ -142,7 +142,7 @@ class Prophet_timeseries:
                 self._model[m_name_withi]= copy.deepcopy(self._model[m_name])
                 self._model[m_name_withi]['model'].fit(case_dict['train'])
             
-                if 'testX' in case_dict.keys():
+                if any(case_dict['testX']):
                     self._model[m_name_withi]['futuredate']= pd.concat([case_dict['trainX'], case_dict['testX']],
                                                                 axis= 0)
                     self._model[m_name_withi]['forecastProphetTable']= self._model[m_name_withi]['model'].predict(self._model[m_name_withi]['futuredate'])
