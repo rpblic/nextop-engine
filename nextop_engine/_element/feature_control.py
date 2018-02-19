@@ -12,7 +12,7 @@ import copy
 from datetime import datetime, timedelta
 from collections import OrderedDict
 
-def xlsx_opener(df_dir, inputfilename, merged= True, inputsheetname= None):
+def xlsx_opener(inputfilename, df_dir= varr.PJ_DIR + varr.DF_DIR, merged= True, inputsheetname= None):
     '''
     엑셀 파일을 엽니다.
     현재는 특정한 디렉토리가 inputfilename에 적혀져 있어야 열릴 수 있는 상태입니다.
@@ -75,6 +75,13 @@ def struct(df, idx_col, ft_col, val_col, y_sum= False):
     df.fillna(0, inplace= True)
     if y_sum: df['y_sum']= df.sum(axis=1)
     return df
+
+
+def parseIntToDatetimeShape(df, datetime_column= 'ds', datetime_format= '%Y%m%d', unite= True):
+    df.ds= df.ds.map(lambda x: pd.to_datetime(x, format= datetime_format))
+    uniteDatetimeShape(df)
+    return df
+
 
 def uniteDatetimeShape(df):
     """

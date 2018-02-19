@@ -3,11 +3,11 @@ import pickle
 from datetime import datetime, timedelta
 
 
-PJ_DIR= 'C:\\Studying\\Project_Nextop\\nextop-engine\\nextop_engine'
+PJ_DIR= 'C:\\Nextop\\nextop-engine\\nextop_engine'
 TEMP_DATA_DIR= '\\_element\\data\\temp_data\\'
 ALG_PROPHET_DIR= '\\_usecase\\algorithm_prophet.py'
 # INPUT_FILENAME=
-DF_DIR= '\\_element\\data\\private\\'
+DF_DIR= '\\_element\\data\\private_IO\\'
 COLNAME_KPPDAILY= ['ds', 'rain_amount', 'temp_max', 'temp_min', 'y']
 START_DATE= datetime(2010, 7, 1)
 START_DATE_STR= START_DATE.strftime("%Y-%m-%d")

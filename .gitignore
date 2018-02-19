@@ -1,8 +1,10 @@
 # Data and Databases
 *.sql
 *.sqlite
-nextop_engine/_element/data/private
-nextop_engine/_element/data/private_return
+*.csv
+private/
+private_return/
+private_IO/
 
 # C extensions
 *.so

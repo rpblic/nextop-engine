@@ -41,7 +41,7 @@ class Data:
             return None
 
 
-    def resetRawData(self, data):
+    def resetRawDataDict(self, data):
         self.data= {}
         self.data= data
 
@@ -100,19 +100,30 @@ class DataRestruction:
         return None
 
 
-    def groupbyObject(self, idx_col, ft_col, val_col, y_sum= False):
+    def groupbyObject(self, idx_col, ft_col, val_col, idx_name= 'ds', y_sum= False,
+                        idx_to_datetime= False, datetime_format= '%Y%m%d'):
         """
         건수별로 이루어져 있는 df를 날짜를 index로, 건수별 유형 코드를 feature로 하는 df로 만듭니다.
         현재는 inputfilename이 input값으로 되어 있고, 이후 df를 인풋으로 하도록 수정할 예정입니다.
         또 현재는 '발송일', '유형', '수량'이라는 feature만을 가진 것으로 짜여져 있는 점,
         날짜 형식이 YYYMMDD 형식인 경우만을 고려하는 점도 수정해야 합니다.
         """
-        for i, df in self.data.items():
-            df= df.groupby([df[idx_col], df[ft_col]]
+        for case in self.data.keys():
+            self.data[case]= self.data[case].groupby(
+                [self.data[case][idx_col], self.data[case][ft_col]]
                 )[val_col].sum().unstack(ft_col)
-            df.fillna(0, inplace= True)
+            self.data[case].fillna(0, inplace= True)
             if y_sum:
-                df['y_sum']= df.sum(axis=1)
+                self.data[case]['y_sum']= self.data[case].sum(axis=1)
+            self.data[case].columns.name= None
+            self.data[case].index.name= idx_name
+            self.data[case].reset_index(drop= False, inplace= True)
+            if idx_to_datetime:
+                self.data[case]= ft_c.parseIntToDatetimeShape(
+                                                                self.data[case],
+                                                                datetime_column= idx_name,
+                                                                datetime_format= datetime_format
+                                                                )
 
 
     def selectSpecificY(self, y_col, cases= None):

@@ -20,7 +20,7 @@ class Result:
     def isIncluded(self, m_name, case_frozenset):
         if m_name is None:
             m_name= frozenset()
-        return bool(m_name.difference(case_frozenset))
+        return (not bool(m_name.difference(case_frozenset)))
 
 
     def printErrRate(self, m_name= None):
@@ -54,7 +54,7 @@ class Result:
         return None
 
 
-    def mergeResult(self, by, m_name= frozenset(), delete_case= True):
+    def mergeResult(self, by, m_name= None, delete_case= True):
         m_frozenset= self.setDefaultModelKeys(m_name= m_name)
         case_dict= self.setDefaultCaseDict(m_frozenset= m_frozenset)
         if by== 'concat':
@@ -71,7 +71,9 @@ class Result:
 
 
     def setDefaultModelKeys(self, m_name):
-        if type(m_name)== str:
+        if not m_name:
+            m_frozenset== frozenset()
+        elif type(m_name)== str:
             m_frozenset= frozenset([m_name, ])
         elif type(m_name)== (list or tuple):
             m_frozenset= frozenset(m_name)
