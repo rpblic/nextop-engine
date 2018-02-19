@@ -17,12 +17,12 @@ class Data:
         self.x_col= []
 
 
-    def setRawYColumn(self, case= frozenset(['raw', ])):
-        try:
-            self.y_col= self.data[case].columns.values.tolist()
-            self.y_col.remove('ds')
-        except:
-            return None
+    def setRawData(self, df, dataname= 'raw', rawdata_setting= True):
+        if rawdata_setting:
+            self.data= {}
+        self.addData(df= df, dataname= dataname)
+        self.setRawYColumn(case= frozenset([dataname, ]))
+        return None
 
 
     def addData(self, df, dataname,
@@ -33,12 +33,12 @@ class Data:
         return None
 
 
-    def setRawData(self, df, dataname= 'raw', rawdata_setting= True):
-        if rawdata_setting:
-            self.data= {}
-        self.addData(df= df, dataname= dataname)
-        self.setRawYColumn(case= frozenset([dataname, ]))
-        return None
+    def setRawYColumn(self, case):
+        try:
+            self.y_col= self.data[case].columns.values.tolist()
+            self.y_col.remove('ds')
+        except:
+            return None
 
 
     def resetRawData(self, data):
@@ -62,30 +62,27 @@ class Data:
         return resultkey
 
 
-    def slicebyTrainTestStructure(self, y, experiment_case= None,
+    def slicebyTrainTestStructure(self, y,
                                 forecastday= varr.FORECASTDAY, cases= None):
         self.x_col.append('ds')
         if not cases:
             cases= copy.deepcopy(list(self.data.keys()))
-        for i in experiment_case:
-            last_date= varr.START_DATE
-            for case in cases:
-                if i in case:
-                    last_date= max(last_date, self.data[case].ds.max())
-            for case in cases:
-                if i in case:
-                    self.data[case].rename(index= str, columns= {y: 'y'}, inplace= True)
-                    result_dict= {}
-                    result_dict['train'], result_dict['test']= ft_c.cut_df(
-                        self.data[case], forecastday= forecastday, last_date= last_date)
-                    result_dict['trainX']= ft_c.cut_col(result_dict['train'], self.x_col)
-                    result_dict['trainY']= ft_c.cut_col(result_dict['train'], 'y')
-                    result_dict['testX']= ft_c.cut_col(result_dict['test'], self.x_col)
-                    try:
-                        result_dict['testY']= ft_c.cut_col(result_dict['test'], 'y')
-                    except:
-                        pass
-                    self.data[case]= result_dict
+        last_date= varr.START_DATE
+        for case in cases:
+            last_date= max(last_date, self.data[case].ds.max())
+        for case in cases:
+            self.data[case].rename(index= str, columns= {y: 'y'}, inplace= True)
+            result_dict= {}
+            result_dict['train'], result_dict['test']= ft_c.cut_df(
+                self.data[case], forecastday= forecastday, last_date= last_date)
+            result_dict['trainX']= ft_c.cut_col(result_dict['train'], self.x_col)
+            result_dict['trainY']= ft_c.cut_col(result_dict['train'], 'y')
+            result_dict['testX']= ft_c.cut_col(result_dict['test'], self.x_col)
+            try:
+                result_dict['testY']= ft_c.cut_col(result_dict['test'], 'y')
+            except:
+                pass
+            self.data[case]= result_dict
         self.x_col.remove('ds')
 
 
@@ -225,7 +222,7 @@ class DataRestruction:
     def commitRestructedData(self):
         self._origin_instance.data= self.data
         self._origin_instance.y_col= self.y_col
-        return copy.deepcopy(self.data)
+        self._origin_instance.showData()
 
 
 
@@ -260,4 +257,4 @@ class DataAddition:
     def commitAddedData(self):
         self._origin_instance.data= self.data
         self._origin_instance.x_col= self.x_col
-        return copy.deepcopy(self.data)
+        self._origin_instance.showData()

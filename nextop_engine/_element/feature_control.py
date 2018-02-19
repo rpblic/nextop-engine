@@ -5,10 +5,8 @@ sys.path.append(path_name)
 from _element import varr
 
 import pandas as pd
-from pandas.plotting import autocorrelation_plot, lag_plot
 import numpy as np
 import matplotlib.pyplot as plt
-from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
 import copy
 from datetime import datetime, timedelta
@@ -33,6 +31,26 @@ def xlsx_opener(df_dir, inputfilename, merged= True, inputsheetname= None):
             dict_of_dfs[sheet_name] = xls.parse(sheet_name)
         return dict_of_dfs
 
+
+def save_as_xlsx(df_dir, dict_of_df, inputfilename, specialfilename=None):
+    """
+    여러 개의 dfsheet로 되어 있는 dictionary(또는 OrderedDict) 데이터를 엑셀에 저장합니다.
+    아직 디렉토리를 설정할 수 없어 나중에 수정해야 합니다.
+    """
+    if specialfilename==None:
+        specialfilename= df_dir + inputfilename[:-5] + '_restructured' + inputfilename[-5:]
+    else:
+        specialfilename= df_dir + inputfilename[:-5] + specialfilename + inputfilename[-5:]
+    writer= pd.ExcelWriter(specialfilename, engine= 'xlsxwriter')
+    if is_dict(dict_of_df):
+        for (dfsheetname, case_df) in dict_of_df.items():
+            case_df['forecast'].to_excel(writer, sheet_name= dfsheetname)
+    else:
+        dict_of_df.to_excel(writer, sheet_name= 'data_merged')
+    writer.save()
+    return None
+
+
 def is_dict(dict_of_dfs):
     if isinstance(dict_of_dfs, type(OrderedDict())) or isinstance(dict_of_dfs, dict):
         return True
@@ -45,9 +63,6 @@ def dict_to_df(dict_of_dfs):
             df_txs= pd.concat([df_txs, df])
     return df_txs
 
-def colname(df, dict_of_colname):
-    df.rename(columns= dict_of_colname, inplace= True)
-    return None
 
 def struct(df, idx_col, ft_col, val_col, y_sum= False):
     """
@@ -72,75 +87,10 @@ def uniteDatetimeShape(df):
         )
 
 
-def save_as_xlsx(df_dir, dict_of_df, inputfilename, specialfilename=None):
-    """
-    여러 개의 dfsheet로 되어 있는 dictionary(또는 OrderedDict) 데이터를 엑셀에 저장합니다.
-    아직 디렉토리를 설정할 수 없어 나중에 수정해야 합니다.
-    """
-    if specialfilename==None:
-        specialfilename= df_dir + inputfilename[:-5] + '_restructured' + inputfilename[-5:]
-    else:
-        specialfilename= df_dir + inputfilename[:-5] + specialfilename + inputfilename[-5:]
-    writer= pd.ExcelWriter(specialfilename, engine= 'xlsxwriter')
-    if is_dict(dict_of_df):
-        for (dfsheetname, case_df) in dict_of_df.items():
-            case_df['forecast'].to_excel(writer, sheet_name= dfsheetname)
-    else:
-        dict_of_df.to_excel(writer, sheet_name= 'data_merged')
-    writer.save()
-    return None
-
-# def add_temp_data(inputfilename, datainfo):
-#     """
-#     날씨 관련 정보를 불러와 df로 구성합니다.
-#     현재는 강수량의 경우 'rain_amount', 기온의 경우 'temp_max'와 'temp_min'으로
-#     저장되도록 짜 놓았습니다. 다른 feature가 추가되어야 되면 수정해야 합니다.
-#     """
-#     year= int(inputfilename[-13:-9])
-#     month= 1
-#     if year== 2010: month +=6
-#     drop_index=[]
-#     positive_value= lambda x: max(x, 0)
-#     df2= pd.read_csv(inputfilename)
-#     df2.columns= ['ds', 'hour', 'amount']
-#     for index, day, _, _ in df2.itertuples():
-#         if len(day)>4:
-#             month+= 1
-#             drop_index.append(index)
-#         else:
-#             try: df2.at[index, 'ds']=datetime(year, month, int(day))
-#             except: print(df2.loc[index, :])
-#     df2.drop(drop_index, inplace=True)
-#     if datainfo== 'rain':
-#         df2= df2.groupby(df2['ds'])['amount'].sum()
-#         df2.rename('rain_amount', inplace= True)
-#         df2= df2.map(positive_value)
-#     elif datainfo== 'temp':
-#         df2= df2[df2['amount'].map(int) != -1]
-#         agg_func= {'temp_max': np.max, 'temp_min': np.min}
-#         df2= df2.groupby(df2['ds'])['amount'].agg(agg_func)
-#     return df2
-
 def dir_list(data_path, ext):
     return [os.path.join(data_path, obj) for obj in os.listdir(data_path)\
             if os.path.splitext(obj)[-1]== ext]
 
-
-# def object_walk(df, colname, on= 'y'):
-#     if on== 'y':
-#         dict_of_dfs= {}
-#         for y_feature in y_col:
-#             df_y= pd.DataFrame(data= df[x_col])
-#             df_y[y_feature]= df[y_feature]
-#             dict_of_dfs[y_feature]= df_y
-#         return dict_of_dfs
-#     elif on== 'x':
-#         dict_of_dfs= {}
-#         for x_feature in x_col:
-#             df_x= pd.DataFrame(data= df[y_col])
-#             df_x[x_feature]= df[x_feature]
-#             dict_of_dfs[x_feature]= df_x
-#         return dict_of_dfs
 
 def cut_col(df, column_list):
     return df[column_list]
@@ -151,6 +101,10 @@ def cut_df(txs, forecastday= varr.FORECASTDAY, last_date= None):
     txs_train= txs[txs.ds<= last_date- timedelta(days=forecastday)]
     txs_test= txs[txs.ds> last_date- timedelta(days=forecastday)]
     return (txs_train, txs_test)
+
+def colname(df, dict_of_colname):
+    df.rename(columns= dict_of_colname, inplace= True)
+    return None
 
 
 def divide_multiple_y(dict_of_df, raw_key, y_col, x_col, checkpoint= None):
