@@ -13,6 +13,8 @@ import numpy as np
 class Data:
     def __init__(self):
         self.data= {}
+        self.grabdata= None
+        self.grabcase= None
         self.y_col= []
         self.x_col= []
 
@@ -22,6 +24,7 @@ class Data:
             self.data= {}
         self.addData(df= df, dataname= dataname)
         self.setRawYColumn(case= frozenset([dataname, ]))
+        self.setGrabData(case= frozenset([dataname, ]))
         return None
 
 
@@ -39,6 +42,11 @@ class Data:
             self.y_col.remove('ds')
         except:
             return None
+
+
+    def setGrabData(self, case):
+        self.grabdata= self.data[case]
+        self.grabcase= case
 
 
     def resetRawDataDict(self, data):
@@ -63,14 +71,15 @@ class Data:
 
 
     def slicebyTrainTestStructure(self, y,
-                                forecastday= varr.FORECASTDAY, cases= None):
+                                forecastday= varr.FORECASTDAY, cases= None, cv_cases= [0,1,2,3,4]):
         self.x_col.append('ds')
         if not cases:
             cases= copy.deepcopy(list(self.data.keys()))
         last_date= varr.START_DATE
+        # for case in cases:
+        #      last_date= max(last_date, self.data[case].ds.max())           
         for case in cases:
-            last_date= max(last_date, self.data[case].ds.max())
-        for case in cases:
+            last_date= self.data[case].ds.max()
             self.data[case].rename(index= str, columns= {y: 'y'}, inplace= True)
             result_dict= {}
             result_dict['train'], result_dict['test']= ft_c.cut_df(
@@ -92,6 +101,8 @@ class DataRestruction:
         self.data= copy.deepcopy(dataclass.data)
         self.y_col= dataclass.y_col
         self.x_col= dataclass.x_col
+        self.grabdata= dataclass.grabdata
+        self.grabcase= dataclass.grabcase
 
 
     def changeColumnName(self, dict_of_colname):
@@ -126,6 +137,11 @@ class DataRestruction:
                                                                 )
 
 
+    def setComparisonCase(self, case):
+        comparisonkey= self.divideKeys(case, 'ComparisonCase')
+        self.data[comparisonkey]= copy.deepcopy(self.data[case])
+
+
     def selectSpecificY(self, y_col, cases= None):
         if not cases:
             cases= copy.deepcopy(list(self.data.keys()))
@@ -157,8 +173,17 @@ class DataRestruction:
 
 
     def deleteCase(self, cases_to_del):
-        for case in cases_to_del:
-            self.data.pop(case, None)
+        if ((type(cases_to_del) is list) or
+            (type(cases_to_del) is set) or
+            (type(cases_to_del) is tuple)):
+            for case in cases_to_del:
+                self.data.pop(case, None)
+        elif type(cases_to_del)== str:
+            for case in list(self.data.keys()):
+                if cases_to_del in case:
+                    self.data.pop(case, None)
+        else:
+            raise TypeError
 
 
     def divideRegion(self, region_num, region_name, start_num= 0,
@@ -234,6 +259,10 @@ class DataRestruction:
         self._origin_instance.data= self.data
         self._origin_instance.y_col= self.y_col
         self._origin_instance.showData()
+        try:
+            self._origin_instance.grabdata= self._origin_instance.data[self._origin_instance.grabcase]
+        except KeyError:
+            print('original grabcase expired; please take another case as grabcase.')
 
 
 
@@ -243,6 +272,8 @@ class DataAddition:
         self.data= dataclass.data
         self.x_col= dataclass.x_col
         self.y_col= dataclass.y_col
+        self.grabdata= dataclass.grabdata
+        self.grabcase= dataclass.grabcase
 
 
     def addXData(self, df_addon, cases= None):
@@ -268,4 +299,8 @@ class DataAddition:
     def commitAddedData(self):
         self._origin_instance.data= self.data
         self._origin_instance.x_col= self.x_col
+        try:
+            self._origin_instance.grabdata= self._origin_instance.data[self._origin_instance.grabcase]
+        except KeyError:
+            print('original grabcase expired; please take another case as grabcase.')
         self._origin_instance.showData()

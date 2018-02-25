@@ -26,11 +26,11 @@ class Result:
     def printErrRate(self, m_name= None):
         for key_frozenset, case_dict in self.forecast_dict.items():
             if self.isIncluded(m_name, key_frozenset):
-                print('RMSE with segment {}: {:0.4f}'.format(m_name, case_dict['RMSE']))
-                print('MAPE with segment {}: {:0.4f}'.format(m_name, case_dict['MAPE']))
-                print('MAPE_with_std with segment {}: {:0.4f}'.format(m_name, case_dict['MAPE_with_std']))
-                print('MAPE_div_std with segment {}: {:0.4f}'.format(m_name, case_dict['MAPE_div_std']))
-                print('sMAPE with segment {}: {:0.4f}'.format(m_name, case_dict['sMAPE']))
+                print('RMSE with segment {}: {:0.4f}'.format(','.join(list(map(str, key_frozenset))), case_dict['RMSE']))
+                print('MAPE with segment {}: {:0.4f}'.format(','.join(list(map(str, key_frozenset))), case_dict['MAPE']))
+                print('MAPE_with_std with segment {}: {:0.4f}'.format(','.join(list(map(str, key_frozenset))), case_dict['MAPE_with_std']))
+                print('MAPE_div_std with segment {}: {:0.4f}'.format(','.join(list(map(str, key_frozenset))), case_dict['MAPE_div_std']))
+                print('sMAPE with segment {}: {:0.4f}'.format(','.join(list(map(str, key_frozenset))), case_dict['sMAPE']))
                 print('\n')
         return None
 
@@ -49,7 +49,7 @@ class Result:
         for key_frozenset, case_dict in self.forecast_dict.items():
             if self.isIncluded(m_name, key_frozenset):
                 case_dict['forecast']['y'].plot()
-                case_dict['forecast']['y'].plot()
+                case_dict['forecast']['yhat'].plot()
                 plt.show()
         return None
 
@@ -114,11 +114,11 @@ class Result:
                         or type(category_elmt)== float):
                         merge_dict[category].append(float(category_elmt))
                     elif type(category_elmt)== (pd.DataFrame):
-                        merge_dict[category].append(float(category_elmt))
+                        merge_dict[category].append(category_elmt)
                     else:
                         print(category, category_elmt, type(category_elmt))
                         raise TypeError
                 except KeyError:
                     merge_dict[category]= list()
-                    merge_dict[category].append(float(category_elmt))
+                    merge_dict[category].append(category_elmt)
         return merge_dict
