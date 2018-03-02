@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 
 # Prophet ######
 
+# noinspection PyUnresolvedReferences
 class Prophet_timeseries:
     def __init__(self, dataclass= None):
         if not dataclass is None:

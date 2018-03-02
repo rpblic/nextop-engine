@@ -3,7 +3,7 @@ import pickle
 from datetime import datetime, timedelta
 
 
-PJ_DIR= 'C:\\Studying\\Project_Nextop\\nextop-engine\\nextop_engine'
+PJ_DIR= 'C:\\Nextop\\nextop-engine\\nextop_engine'
 TEMP_DATA_DIR= '\\_element\\data\\temp_data\\'
 ALG_PROPHET_DIR= '\\_usecase\\algorithm_prophet.py'
 # INPUT_FILENAME=
