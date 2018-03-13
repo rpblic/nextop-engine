@@ -1,0 +1,65 @@
+# -*- mode: python -*-
+
+block_cipher = None
+
+
+a = Analysis(['pyinstaller_sample.py'],
+             pathex=['c:\\Nextop\\nextop-engine\\nextop_engine'],
+             binaries=[
+             ('.\\_element\\data\\data_in_use\\', '_element\\data\\data_in_use'),
+             ('.\\_element\\data\\temp_data\\', '_element\\data\\temp_data\\'),
+             ('.\\_element\\data\\build_data\\', 'fbprophet\\stan_models')],
+             datas=[],
+             hiddenimports=['numpy.core.multiarray'],
+             hookspath=[],
+             runtime_hooks=[],
+             excludes=[],
+             win_no_prefer_redirects=False,
+             win_private_assemblies=False,
+             cipher=block_cipher)
+
+pandas_tree = Tree(
+    'C:\\ProgramData\\Anaconda3\\envs\\build_py35\\Lib\\site-packages\\pandas', 
+    prefix='pandas', excludes=["*.pyc"]
+    )
+a.datas += pandas_tree
+a.binaries = list(filter(lambda x: 'pandas' not in x[0], a.binaries))
+
+cython_tree = Tree(
+    'C:\\ProgramData\\Anaconda3\\envs\\build_py35\\Lib\\site-packages\\Cython', 
+    prefix='Cython', excludes=["*.pyc"]
+    )
+a.datas += cython_tree
+a.binaries = list(filter(lambda x: 'Cython' not in x[0], a.binaries))
+
+pystan_tree = Tree(
+    'C:\\ProgramData\\Anaconda3\\envs\\build_py35\\Lib\\site-packages\\pystan', 
+    prefix='pystan', excludes=["*.pyc"]
+    )
+a.datas += pystan_tree
+a.binaries = list(filter(lambda x: 'pystan' not in x[0], a.binaries))
+
+pyplot_tree = Tree(
+    'C:\\ProgramData\\Anaconda3\\envs\\build_py35\\Lib\\site-packages\\matplotlib', 
+    prefix='matplotlib', excludes=["*.pyc"]
+    )
+a.datas += pyplot_tree
+a.binaries = list(filter(lambda x: 'matplotlib' not in x[0], a.binaries))
+
+pyz = PYZ(a.pure, a.zipped_data,
+             cipher=block_cipher)
+exe = EXE(pyz,
+          a.scripts,
+          exclude_binaries=True,
+          name='pyinstaller_sample',
+          debug=False,
+          strip=False,
+          upx=True,
+          console=True )
+coll = COLLECT(exe,
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               strip=False,
+               upx=True,
+               name='pyinstaller_sample')

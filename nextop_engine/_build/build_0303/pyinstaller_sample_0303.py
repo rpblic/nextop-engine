@@ -1,5 +1,8 @@
 
 # coding: utf-8
+from Cython import *
+from scipy import optimize
+import numpy, pandas, matplotlib, pystan, fbprophet
 
 import os, sys
 path_name= os.getcwd()
@@ -9,31 +12,21 @@ print(path_name)
 from _element import feature_control as ft_c
 from _element.data_control import Data, DataRestruction, DataAddition
 from _element import varr
-from _element import calculations as calc
+
 from _element.result_control import Result
 
 from _alg.prophet import Prophet_timeseries
-from _alg.arima import Arima_timeseries
-
-from _evaluation.cross_validation import Cross_Validation
-from _evaluation import compare
-
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-from sklearn.mixture import GaussianMixture
 
 
 INPUT_FILENAME= 'KPP일별입고(13_17)_daily_obj.xlsx'
-df_raw= ft_c.xlsx_opener(INPUT_FILENAME, path_name+varr.DF_DIR)
+df_raw= ft_c.xlsx_opener(INPUT_FILENAME, 'C:\\Nextop\\nextop-engine\\nextop_engine\\_element\\data\\data_in_use\\')
 data= Data()
 data.setRawData(df_raw)
 
 restruct= DataRestruction(data)
 restruct.selectSpecificY(['y_sum'])
 df_commit= restruct.commitRestructedData()
-df_temp= ft_c.xlsx_opener('temp_data_merged.xlsx', path_name+varr.TEMP_DATA_DIR)
+df_temp= ft_c.xlsx_opener('temp_data_merged.xlsx', 'C:\\Nextop\\nextop-engine\\nextop_engine\\_element\\data\\temp_data\\')
 addition= DataAddition(data)
 addition.addXData(df_temp)
 df_commit= addition.commitAddedData()
@@ -57,6 +50,9 @@ data.slicebyTrainTestStructure(y= 'y_sum')
 doprophet= Prophet_timeseries(dataclass= data)
 doprophet.addModel('weekday,object', 'day', regressor= 'rain_amount')
 doprophet.fit('weekday,object')
+print(doprophet._model.keys())
+print(doprophet._model[frozenset({'weekday,object', 'weekday'})])
+doprophet.plot(frozenset({'weekday,object', 'weekday'}))
 r= Result()
 doprophet.forecast('weekday,object', r.forecast_dict)
 print(r.forecast_dict)
