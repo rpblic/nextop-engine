@@ -7,8 +7,11 @@
       <sourceFolder url="file://$MODULE_DIR$/_evaluation" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/_usecase" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.6 (nextop_engine)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PyDocumentationSettings">
+    <option name="renderExternalDocumentation" value="true" />
   </component>
   <component name="TestRunnerService">
     <option name="projectConfiguration" value="Nosetests" />
