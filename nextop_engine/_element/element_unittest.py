@@ -11,6 +11,7 @@ df= pd.DataFrame.from_items([
             ('temp', ['10', '5', '10', '15', '5', ]),
             ('rain', ['0', '10', '0', '0', '0', ]),
             ])
+feature.uniteDatetimeShape(df, datetime_format= '%Y-%m-%d')
 
 df2= pd.DataFrame.from_items([
             ('ds', ['2011-01-01', '2011-01-02', '2011-01-03', '2011-01-04', '2011-01-05', ]),
@@ -19,6 +20,7 @@ df2= pd.DataFrame.from_items([
             ('temp', ['10', '5', '5', '15', '15', ]),
             ('rain', ['0', '1', '0', '2', '0', ]),
             ])
+feature.uniteDatetimeShape(df, datetime_format= '%Y-%m-%d')
 
 df_preprocessing= pd.DataFrame.from_items([
             ('ds', ['2011-01-01', '2011-01-02', '2011-01-02',
@@ -185,6 +187,75 @@ class DataTest(unittest.TestCase):
             ['2010-01-03', '2010-01-04', '2010-01-05',]
             )
 
+class TableTest(unittest.TestCase):
+    def setUp(self):
+        self.dataclass= data.Data(df, 'test')
+        self.dataclass.addMultipleXColAttribute(['ds','temp','rain'])
+        self.table= self.dataclass[testcase]
+        self.table.addDFCase(self.dataclass, testcase, forecastday= 2)
+
+    def test_init(self):
+        self.assertEqual(
+            self.table.shape,
+            (5,5)
+            )
+
+    def test_y_col(self):
+        self.assertEqual(
+            set(self.table.y_col),
+            {'y', 'y2'}
+            )
+
+    def test_y_columnname(self):
+        self.table= data.Table(self.table[['ds', 'y']])
+        self.table.addDFCase(self.dataclass, testcase)
+        self.assertEqual(
+            self.table.y_columnname,
+            'y'
+            )
+
+    def test_y_columnname_atterr(self):
+        self.assertEqual(
+            self.table.isYUnique(),
+            False
+            )
+
+    def test_x_col(self):
+        self.assertEqual(
+            set(self.table.x_col),
+            {'ds', 'temp', 'rain'}
+            )
+
+    def test_last_date(self):
+        self.assertEqual(
+            self.table.last_date.strftime(format= '%Y-%m-%d'),
+            '2010-01-05'
+            )
+
+    def test_XX(self):
+        self.assertEqual(
+            self.table.XX.shape,
+            (5, 3)
+            )
+
+    def test_YY(self):
+        self.assertEqual(
+            self.table.YY.shape,
+            (5, 2)
+            )
+
+    def test_trainX(self):
+        self.assertEqual(
+            self.table.trainX.shape,
+            (3, 3)
+            )
+
+    def test_testY(self):
+        self.assertEqual(
+            self.table.testY.shape,
+            (2,2)
+            )
+
 class CaseTest(unittest.TestCase):
     def setUp(self):
         self.aCase= case.Case([])
@@ -267,6 +338,7 @@ class VisualizationTest(unittest.TestCase):
 
 if __name__== '__main__':
     TestList= {'data':DataTest,
+                'table': TableTest,
                 'case': CaseTest,
                 'feature': FeatureTest,
                 'io': IOTest,

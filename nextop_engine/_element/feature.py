@@ -29,7 +29,7 @@ def uniteDatetimeShape(df, datetime_column= 'ds', datetime_format= '%Y-%m-%d'):
     df[datetime_column]= pd.to_datetime(
         df[datetime_column], box=True, format= datetime_format, exact=True)
 
-def isnotDiscontinuousDatetime(df, datetime_column= 'ds'):
+def isDatetimeContinuous(df, datetime_column= 'ds'):
     #TODO
     return None
 

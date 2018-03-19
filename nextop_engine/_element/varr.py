@@ -8,11 +8,7 @@ import pickle
 from datetime import datetime, timedelta
 
 
-<<<<<<< HEAD
 PJ_DIR= path_name
-=======
-PJ_DIR= 'C:\\Nextop\\nextop-engine\\nextop_engine'
->>>>>>> 50a33f5afa4a5ffc7bd9be8f9302cc2cbdef7492
 TEMP_DATA_DIR= '\\_element\\data\\temp_data\\'
 DF_DIR= '\\_element\\data\\data_in_use\\'
 START_DATE= datetime(2010, 7, 1)

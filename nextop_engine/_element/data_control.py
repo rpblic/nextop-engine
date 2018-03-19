@@ -70,29 +70,29 @@ class Data:
     #     return resultkey
 
 
-    def slicebyTrainTestStructure(self, y,
-                                forecastday= varr.FORECASTDAY, cases= None, cv_cases= [0,1,2,3,4]):
-        self.x_col.append('ds')
-        if not cases:
-            cases= copy.deepcopy(list(self.data.keys()))
-        last_date= varr.START_DATE
-        # for case in cases:
-        #      last_date= max(last_date, self.data[case].ds.max())           
-        for case in cases:
-            last_date= self.data[case].ds.max()
-            self.data[case].rename(index= str, columns= {y: 'y'}, inplace= True)
-            result_dict= {}
-            result_dict['train'], result_dict['test']= ft_c.cut_df(
-                self.data[case], forecastday= forecastday, last_date= last_date)
-            result_dict['trainX']= ft_c.cut_col(result_dict['train'], self.x_col)
-            result_dict['trainY']= ft_c.cut_col(result_dict['train'], 'y')
-            result_dict['testX']= ft_c.cut_col(result_dict['test'], self.x_col)
-            try:
-                result_dict['testY']= ft_c.cut_col(result_dict['test'], 'y')
-            except:
-                pass
-            self.data[case]= result_dict
-        self.x_col.remove('ds')
+    # def slicebyTrainTestStructure(self, y,
+    #                             forecastday= varr.FORECASTDAY, cases= None, cv_cases= [0,1,2,3,4]):
+    #     self.x_col.append('ds')
+    #     if not cases:
+    #         cases= copy.deepcopy(list(self.data.keys()))
+    #     last_date= varr.START_DATE
+    #     # for case in cases:
+    #     #      last_date= max(last_date, self.data[case].ds.max())           
+    #     for case in cases:
+    #         last_date= self.data[case].ds.max()
+    #         self.data[case].rename(index= str, columns= {y: 'y'}, inplace= True)
+    #         result_dict= {}
+    #         result_dict['train'], result_dict['test']= ft_c.cut_df(
+    #             self.data[case], forecastday= forecastday, last_date= last_date)
+    #         result_dict['trainX']= ft_c.cut_col(result_dict['train'], self.x_col)
+    #         result_dict['trainY']= ft_c.cut_col(result_dict['train'], 'y')
+    #         result_dict['testX']= ft_c.cut_col(result_dict['test'], self.x_col)
+    #         try:
+    #             result_dict['testY']= ft_c.cut_col(result_dict['test'], 'y')
+    #         except:
+    #             pass
+    #         self.data[case]= result_dict
+    #     self.x_col.remove('ds')
 
 
 class DataRestruction:

@@ -10,6 +10,7 @@ from _element import case
 import copy
 import pandas as pd
 import numpy as np
+from datetime import timedelta
 
 
 class Data(dict):
@@ -21,11 +22,13 @@ class Data(dict):
 
     def addDF(self, df, casename):
         case_by_frozenset= case.Case((casename, ))
-        self[case_by_frozenset]= df.copy()
+        self[case_by_frozenset]= Table(df.copy())
+        self[case_by_frozenset].addDFCase(self, case_by_frozenset)
         return None
 
     def copyDFfrom(self, copycase, case):
-        self[copycase]= copy.deepcopy(self[case])
+        self[copycase]= Table(self[case].copy())
+        self[copycase].addDFCase(self, copycase)
 
 
 
@@ -57,13 +60,11 @@ class Data(dict):
 
     @property
     def y_col(self):
-        return {itercase: set(self[itercase].columns.values).difference(self._x_att)
-            for itercase in list(self.keys())}
+        return {itercase: self[itercase].y_col for itercase in list(self.keys())}
 
     @property
     def x_col(self):
-        return {itercase: set(self[itercase].columns.values).intersection(self._x_att)
-            for itercase in list(self.keys())}
+        return {itercase: self[itercase].x_col for itercase in list(self.keys())}
 
     @x_col.setter
     def x_col(self, value):
@@ -158,7 +159,7 @@ class Data(dict):
             self.selectOneYColumnInCase(y, dividecase)
 
     def selectOneYColumnInCase(self, y, case):
-        columns= copy.deepcopy(list(self.x_col[case]))
+        columns= copy.deepcopy(self[case].x_col)
         columns.sort()
         columns.append(y)
         self[case]= self[case][columns]
@@ -195,7 +196,7 @@ class Data(dict):
 
     def addCycleSeries(self, df, cycle, cycle_name, start_num= 0):
         len_of_raw= df.shape[0]
-        cycle_df= pd.DataFrame(np.remainder(
+        cycle_df= Table(np.remainder(
                         np.arange(len_of_raw)+start_num, cycle),
                     columns= [cycle_name])
         return df.join(cycle_df)
@@ -213,36 +214,10 @@ class Data(dict):
 
     def addPeriodSeries(self, df, period, period_name, start_num= 0):
         len_of_raw= df.shape[0]
-        period_df= pd.DataFrame(
+        period_df= Table(
                         (np.arange(len_of_raw)+start_num)//period,
                         columns= [period_name])
         return df.join(period_df)
-
-
-
-    # def slicebyTrainTestStructure(self, y,
-    # forecastday= varr.FORECASTDAY, cases= None, cv_cases= [0,1,2,3,4]):
-    #     self.x_col.append('ds')
-    #     if not cases:
-    #         cases= copy.deepcopy(list(self.data.keys()))
-    #     last_date= varr.START_DATE
-    #     # for case in cases:
-    #     #      last_date= max(last_date, self.data[case].ds.max())           
-    #     for case in cases:
-    #         last_date= self.data[case].ds.max()
-    #         self.data[case].rename(index= str, columns= {y: 'y'}, inplace= True)
-    #         result_dict= {}
-    #         result_dict['train'], result_dict['test']= ft_c.cut_df(
-    #             self.data[case], forecastday= forecastday, last_date= last_date)
-    #         result_dict['trainX']= ft_c.cut_col(result_dict['train'], self.x_col)
-    #         result_dict['trainY']= ft_c.cut_col(result_dict['train'], 'y')
-    #         result_dict['testX']= ft_c.cut_col(result_dict['test'], self.x_col)
-    #         try:
-    #             result_dict['testY']= ft_c.cut_col(result_dict['test'], 'y')
-    #         except:
-    #             pass
-    #         self.data[case]= result_dict
-    #     self.x_col.remove('ds')
 
 
 
@@ -255,14 +230,16 @@ class Data(dict):
 
 
 class Table(pd.DataFrame):
-    def __init__(self, dataclass, case):
+    def addDFCase(self, dataclass, case, forecastday= varr.FORECASTDAY):
         self.dataclass= dataclass
         self.case= case
-        super(__class__, self).__init__(dataclass[case])
+        self.forecastday= forecastday
 
     @property
     def y_col(self):
-        return list(self.dataclass.y_col[case])
+        return list(
+                set(self.columns.values).difference(self.dataclass._x_att)
+                )
 
     @property
     def y_columnname(self):
@@ -282,7 +259,9 @@ class Table(pd.DataFrame):
 
     @property
     def x_col(self):
-        return self.dataclass.x_col[case]
+        return list(
+                set(self.columns.values).intersection(self.dataclass._x_att)
+                )
 
         
 
@@ -297,6 +276,42 @@ class Table(pd.DataFrame):
         return ('ds' in self.columns.values.tolist())
 
 
+
+    @property
+    def XX(self):
+        return self[self.x_col]
+
+    @property
+    def YY(self):
+        return self[self.y_col]
+
+    @property
+    def train(self):
+        return self[self['ds'] <= self.last_date - timedelta(
+                    days= self.forecastday
+                    )]
+
+    @property
+    def test(self):
+        return self[self['ds'] > self.last_date - timedelta(
+                    days= self.forecastday
+                    )]
+
+    @property
+    def trainX(self):
+        return self.train[self.x_col]
+
+    @property
+    def trainY(self):
+        return self.train[self.y_col]
+
+    @property
+    def testX(self):
+        return self.test[self.x_col]
+
+    @property
+    def testY(self):
+        return self.test[self.y_col]
 
 
 if __name__== '__main__':
