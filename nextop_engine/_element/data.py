@@ -6,6 +6,7 @@ sys.path.append(path_name)
 from _element import varr
 from _element import feature
 from _element import case
+from _element import table
 
 import copy
 import pandas as pd
@@ -22,13 +23,13 @@ class Data(dict):
 
     def addDF(self, df, casename):
         case_by_frozenset= case.Case((casename, ))
-        self[case_by_frozenset]= Table(df.copy())
-        self[case_by_frozenset].addDFCase(self, case_by_frozenset)
+        self[case_by_frozenset]= table.Table(df.copy())
+        self[case_by_frozenset].setDFCase(self, case_by_frozenset)
         return None
 
     def copyDFfrom(self, copycase, case):
-        self[copycase]= Table(self[case].copy())
-        self[copycase].addDFCase(self, copycase)
+        self[copycase]= table.Table(self[case].copy())
+        self[copycase].setDFCase(self, copycase)
 
 
 
@@ -196,7 +197,7 @@ class Data(dict):
 
     def addCycleSeries(self, df, cycle, cycle_name, start_num= 0):
         len_of_raw= df.shape[0]
-        cycle_df= Table(np.remainder(
+        cycle_df= table.Table(np.remainder(
                         np.arange(len_of_raw)+start_num, cycle),
                     columns= [cycle_name])
         return df.join(cycle_df)
@@ -214,7 +215,7 @@ class Data(dict):
 
     def addPeriodSeries(self, df, period, period_name, start_num= 0):
         len_of_raw= df.shape[0]
-        period_df= Table(
+        period_df= table.Table(
                         (np.arange(len_of_raw)+start_num)//period,
                         columns= [period_name])
         return df.join(period_df)
@@ -227,91 +228,6 @@ class Data(dict):
     def not_in_list_Error(self):
         raise ValueError
 
-
-
-class Table(pd.DataFrame):
-    def addDFCase(self, dataclass, case, forecastday= varr.FORECASTDAY):
-        self.dataclass= dataclass
-        self.case= case
-        self.forecastday= forecastday
-
-    @property
-    def y_col(self):
-        return list(
-                set(self.columns.values).difference(self.dataclass._x_att)
-                )
-
-    @property
-    def y_columnname(self):
-        if self.isYUnique():
-            return self.y_col[0]
-        else:
-            raise AttributeError
-
-    @y_columnname.setter
-    def y_columnname(self, val):
-        self.rename(index= str, columns= {self.y_columnname: val}, inplace= True)
-
-    def isYUnique(self):
-        return (len(self.y_col) == 1)
-
-
-
-    @property
-    def x_col(self):
-        return list(
-                set(self.columns.values).intersection(self.dataclass._x_att)
-                )
-
-        
-
-    @property
-    def last_date(self):
-        if self.hasDS():
-            return self['ds'].max()
-        else:
-            raise KeyError
-
-    def hasDS(self):
-        return ('ds' in self.columns.values.tolist())
-
-
-
-    @property
-    def XX(self):
-        return self[self.x_col]
-
-    @property
-    def YY(self):
-        return self[self.y_col]
-
-    @property
-    def train(self):
-        return self[self['ds'] <= self.last_date - timedelta(
-                    days= self.forecastday
-                    )]
-
-    @property
-    def test(self):
-        return self[self['ds'] > self.last_date - timedelta(
-                    days= self.forecastday
-                    )]
-
-    @property
-    def trainX(self):
-        return self.train[self.x_col]
-
-    @property
-    def trainY(self):
-        return self.train[self.y_col]
-
-    @property
-    def testX(self):
-        return self.test[self.x_col]
-
-    @property
-    def testY(self):
-        return self.test[self.y_col]
 
 
 if __name__== '__main__':

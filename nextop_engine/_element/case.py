@@ -1,5 +1,6 @@
 class Case(frozenset):
     def edit(self):
+        #TODO
         return None
 
 def makeCasebyProperty(inputproperty):

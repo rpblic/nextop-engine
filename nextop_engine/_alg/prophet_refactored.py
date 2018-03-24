@@ -17,7 +17,7 @@ import copy
 import collections
 import matplotlib.pyplot as plt
 
-# Prophet ######
+
 
 class Prophet_timeseries:
     def __init__(self, dataclass= None):
@@ -148,11 +148,7 @@ class Prophet_timeseries:
     def setEvent(self):
         # TODO: 작성
         return None
-
-
-    def remove_event(self):
-        # TODO: 작성
-        return None
+        
 
 
     def fit(self, m_name, log_fit= False):
